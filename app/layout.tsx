@@ -8,13 +8,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <AppProviders>
+    <AppProviders>
+      <html lang="en">
+        <body>
           <Header />
           <main>{children}</main>
-        </AppProviders>
-      </body>
-    </html>
+        </body>
+      </html>
+    </AppProviders>
   );
 }
