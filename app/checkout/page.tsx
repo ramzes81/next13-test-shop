@@ -120,7 +120,7 @@ export default function Checkout() {
           type="button"
           value="Apply Promo Code"
           disabled={!!promocodeFormError}
-          onClick={async (event) => {
+          onClick={async () => {
             try {
               const validatedPromoDiscount =
                 await validatePromocode(promoUserInput);
