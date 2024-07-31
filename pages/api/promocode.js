@@ -9,33 +9,35 @@ const utils = require("./../../utils");
  * @returns the matching single or double digits following the X
  */
 function checkPromoCode(req) {
-    console.log("request body : " + req.body);
-    var promoCode = req.body.promoCode;
+  console.log("request body : " + req.body);
+  var promoCode = req.body.promoCode;
 
-    console.log("promoCode received : " + promoCode);
+  console.log("promoCode received : " + promoCode);
 
-    if (promoCode) {
-        var match = promoCode.match(/^X([\d]{1,2})$/);
-        if (match != null) {
-            return parseInt(match[1], 10);
-        }
+  if (promoCode) {
+    var match = promoCode.match(/^X([\d]{1,2})$/);
+    if (match != null) {
+      return parseInt(match[1], 10);
     }
-    return null;
+  }
+  return null;
 }
 
 module.exports = function (req, res) {
-    var discount = checkPromoCode(req);
+  var discount = checkPromoCode(req);
 
-    if (Number.isFinite(discount)) {
-        // it's a valid promo code
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({
-            discounttype: "percent",
-            amount: discount
-        }));
-    } else {
-        utils.writeErrorResponse(res, [
-            utils.createError("promoCode", "The promo code you supplied is invalid.")
-        ]);
-    }
+  if (Number.isFinite(discount)) {
+    // it's a valid promo code
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        discounttype: "percent",
+        amount: discount,
+      }),
+    );
+  } else {
+    utils.writeErrorResponse(res, [
+      utils.createError("promoCode", "The promo code you supplied is invalid."),
+    ]);
+  }
 };
