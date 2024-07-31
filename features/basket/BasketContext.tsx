@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import Product from "../../types/Product";
 import usePersistedState from "@utilityjs/use-persisted-state";
 
