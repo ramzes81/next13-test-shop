@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import useBasket from "../features/basket/useBasket";
 import styled from "styled-components";
 import useSWR, { Key } from "swr";
-import fetch from "../util/fetch";
 import { useRouter } from "next/router";
 import usePersistedState from "@utilityjs/use-persisted-state";
 
