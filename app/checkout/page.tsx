@@ -5,7 +5,7 @@ import useBasket from "../../features/basket/useBasket";
 import styled from "styled-components";
 import usePersistedState from "@utilityjs/use-persisted-state";
 import PromoDiscount from "../../types/PromoDiscount";
-import { validatePromocode } from "../actions";
+import { checkout, validatePromocode } from "../actions";
 
 const ProductStyles = styled.div`
   display: flex;
@@ -32,8 +32,6 @@ interface CheckoutResponseError {
   errors: { field: string; msg: string }[];
 }
 
-type CheckoutResponse = CheckoutResponseSuccess & CheckoutResponseError;
-
 export default function Checkout() {
   const { basket, totalSum, changeQuantity } = useBasket();
 
@@ -56,108 +54,85 @@ export default function Checkout() {
     [totalSum, appliedPromo],
   );
 
-  const [checkOutTimestamp, setCheckOutTimestamp] = useState(0);
-
-  // const { data: checkOutResult, error: checkOutError } =
-  //   useSWR<CheckoutResponse>(
-  //     checkOutTimestamp ? ["/api/checkout", checkOutTimestamp] : null,
-  //     (url) =>
-  //       fetch<CheckoutResponse>(url, {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         method: "POST",
-  //         body: JSON.stringify({
-  //           basket: Object.values(basket),
-  //           cardNumber: creditCardInput,
-  //         }),
-  //       }),
-  //     { revalidateOnFocus: false },
-  //   );
-
-  // useEffect(() => {
-  //   if (checkOutResult) {
-  //     if (checkOutResult.msg) {
-  //       router.push("/checkout_success");
-  //     }
-  //     if (checkOutResult.errors) {
-  //       router.push("/checkout_failure");
-  //     }
-  //   }
-  //   if (checkOutError) {
-  //     router.push("/checkout_failure");
-  //   }
-  // }, [checkOutResult, checkOutError]);
-
   return (
     <div>
-      <h1>Checkout</h1>
-      {Object.entries(basket || {}).map(([, product]) => (
-        <ProductStyles key={product.sku}>
-          <ProductName>{product.name}</ProductName>
+      <form action={checkout}>
+        <h1>Checkout</h1>
+        {Object.entries(basket || {}).map(([, product], index) => (
+          <ProductStyles key={product.sku}>
+            <ProductName>{product.name}</ProductName>
+            <input
+              type="hidden"
+              name={`basket[${index}].sku`}
+              value={product.sku}
+            />
+            <input
+              type="number"
+              name={`basket[${index}].quantity`}
+              value={product.quantity}
+              onChange={(e) => changeQuantity(product.sku, +e.target.value)}
+              min={0}
+            />
+          </ProductStyles>
+        ))}
+        <div>
           <input
-            type="number"
-            value={product.quantity}
-            onChange={(e) => changeQuantity(product.sku, +e.target.value)}
-            min={0}
+            type="hidden"
+            name="promocode"
+            value={appliedPromo?.promocode}
           />
-        </ProductStyles>
-      ))}
-      <div>
-        <label>
-          Enter Promo Code
+          <label>
+            Enter Promo Code
+            <input
+              type="text"
+              value={promoUserInput}
+              onChange={(e) => {
+                setPromocodeFormError(null);
+                setUserPromoInput(e.target.value);
+              }}
+            />
+            {promocodeFormError && <span>{promocodeFormError}</span>}
+          </label>
           <input
-            type="text"
-            value={promoUserInput}
-            onChange={(e) => {
-              setPromocodeFormError(null);
-              setUserPromoInput(e.target.value);
+            type="button"
+            value="Apply Promo Code"
+            disabled={!!promocodeFormError}
+            onClick={async () => {
+              try {
+                const validatedPromoDiscount =
+                  await validatePromocode(promoUserInput);
+                setAppliedPromo({
+                  discount: validatedPromoDiscount,
+                  promocode: promoUserInput,
+                });
+                setUserPromoInput("");
+              } catch (e) {
+                setPromocodeFormError(e.message);
+              }
             }}
           />
-          {promocodeFormError && <span>{promocodeFormError}</span>}
-        </label>
-        <input
-          type="button"
-          value="Apply Promo Code"
-          disabled={!!promocodeFormError}
-          onClick={async () => {
-            try {
-              const validatedPromoDiscount =
-                await validatePromocode(promoUserInput);
-              setAppliedPromo({
-                discount: validatedPromoDiscount,
-                promocode: promoUserInput,
-              });
-              setUserPromoInput("");
-            } catch (e) {
-              setPromocodeFormError(e.message);
-            }
-          }}
-        />
-      </div>
-      <div>Sub Total : {totalSum?.toFixed(2)}</div>
-      {appliedPromo && (
-        <div>
-          Promotional Discount Amount: {appliedPromo.promocode} -{" "}
-          {appliedPromo.discount.amount} %
         </div>
-      )}
-      <div>Basket Total: {totalSumWithPromo?.toFixed(2)}</div>
-      <div>
-        <label>
-          Please enter your credit card number
-          <input
-            type="text"
-            value={creditCardInput}
-            onChange={(e) => setCreditCardInput(e.target.value)}
-          />
-        </label>
-        <input
-          type="button"
-          value="Checkout"
-          onClick={() => setCheckOutTimestamp(new Date().getTime())}
-        />
-      </div>
+        <div>Sub Total : {totalSum?.toFixed(2)}</div>
+        {appliedPromo && (
+          <div>
+            Promotional Discount Amount: {appliedPromo.promocode} -{" "}
+            {appliedPromo.discount.amount} %
+          </div>
+        )}
+        <div>Basket Total: {totalSumWithPromo?.toFixed(2)}</div>
+        <div>
+          <label>
+            Please enter your credit card number
+            <input
+              type="text"
+              name="cardNumber"
+              value={creditCardInput}
+              onChange={(e) => setCreditCardInput(e.target.value)}
+            />
+          </label>
+          <input type="submit" value="Checkout" />
+        </div>
+      </form>
     </div>
   );
 }

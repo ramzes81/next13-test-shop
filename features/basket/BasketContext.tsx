@@ -10,6 +10,7 @@ export interface BasketContextValue {
   totalSum: number;
   addToBasket: (Product) => void;
   changeQuantity: (sku: number, quantity: number) => void;
+  clearBasket: () => void;
 }
 
 interface BasketProduct extends Product {
@@ -69,6 +70,10 @@ export default function BasketContextProvider({ children }) {
     });
   }, []);
 
+  const clearBasket = useCallback(() => {
+    setBasket({});
+  }, []);
+
   const value: BasketContextValue = useMemo(
     () => ({
       basket,
@@ -76,6 +81,7 @@ export default function BasketContextProvider({ children }) {
       totalQuantity,
       totalSum,
       changeQuantity,
+      clearBasket,
     }),
     [basket],
   );

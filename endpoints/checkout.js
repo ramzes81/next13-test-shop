@@ -12,7 +12,7 @@ function checkCardNumber(cardNumber) {
     );
   }
 
-  if (cardNumber.length != 16) {
+  if (cardNumber.length !== 16) {
     return utils.createError(
       "cardNumber",
       "You have not supplied a valid card number.",
@@ -70,6 +70,8 @@ module.exports = function (req, res) {
   console.log("POST to /checkout");
 
   var body = JSON.parse(req.body);
+
+  console.log(body);
 
   var errors = [];
   var basketError = checkBasket(body.basket);

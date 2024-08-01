@@ -3,6 +3,8 @@
 import { API_ROUTES, generateApiURL } from "../lib/api";
 import PromoDiscount from "../types/PromoDiscount";
 import { ApiResponse } from "../types/api";
+import { formDataToObject } from "formdata2json";
+import { redirect } from "next/navigation";
 
 export async function validatePromocode(
   promocode: string,
@@ -31,5 +33,28 @@ export async function validatePromocode(
     throw new Error(promoDiscountResponse.errors.map((e) => e.msg).join("\n"));
   } else {
     throw new Error("Something went wrong, try again later!");
+  }
+}
+
+export async function checkout(formData: FormData) {
+  const submittedDataObject = formDataToObject(formData);
+  const processedSubmittedDataObject = {
+    ...submittedDataObject,
+    // mocked BE expects string here...
+    cardNumber: submittedDataObject.cardNumber?.toString(),
+  };
+
+  const response = await fetch(generateApiURL(API_ROUTES.CHECKOUT), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(processedSubmittedDataObject),
+  });
+
+  if (response.ok) {
+    redirect("/checkout/success");
+  } else {
+    redirect("/checkout/failure");
   }
 }
