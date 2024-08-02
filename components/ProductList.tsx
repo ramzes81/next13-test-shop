@@ -1,37 +1,55 @@
-import Product from "../types/Product";
 import React from "react";
-import styled from "styled-components";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Divider,
+  Heading,
+  SimpleGrid,
+  Text,
+} from "@chakra-ui/react";
+
+import Product from "../types/Product";
 
 interface ProductListProps {
   products: Product[];
   onProductAdd: (Product) => void;
 }
 
-const ProductStyles = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const ProductName = styled.h3`
-  flex: 1 1 300px;
-`;
-
-const Price = styled.span``;
-
 export default function ProductList({
   products,
   onProductAdd,
 }: ProductListProps) {
   return (
-    <div>
+    <SimpleGrid
+      spacing={4}
+      templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+    >
       {products.map((product) => (
-        <ProductStyles key={product.sku}>
-          <ProductName>{product.name}</ProductName>
-          <Price>{product.price}</Price>
-          <button onClick={() => onProductAdd(product)}>Add to basket</button>
-        </ProductStyles>
+        <Card key={product.sku}>
+          <CardHeader>
+            <Heading size="md">{product.name}</Heading>
+          </CardHeader>
+          <CardBody>
+            <Text color="blue.600" fontSize="2xl">
+              ${product.price}
+            </Text>
+          </CardBody>
+          <Divider />
+          <CardFooter>
+            <Button
+              variant="solid"
+              colorScheme="blue"
+              size="sm"
+              onClick={() => onProductAdd(product)}
+            >
+              Add to basket
+            </Button>
+          </CardFooter>
+        </Card>
       ))}
-    </div>
+    </SimpleGrid>
   );
 }

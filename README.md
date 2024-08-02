@@ -2,7 +2,7 @@ This is a sample NextJS app directory webshop implementation.
 
 `/endpoints` folder with BE endpoints was provided as is, checkout flow with `checkout/success` and `checkout/failure` were hard requirements.
 
-There is no styling in the project, just sample business logic.
+There is only super basic styling in the project.
 
 To run:
 

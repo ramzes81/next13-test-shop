@@ -5,6 +5,7 @@ import useBasket from "../../features/basket/useBasket";
 import ProductList from "../../components/ProductList";
 import Link from "next/link";
 import React from "react";
+import { Box } from "@chakra-ui/react";
 
 export default function ProductsScreen({ products }: { products: Product[] }) {
   const { addToBasket } = useBasket();
@@ -12,7 +13,9 @@ export default function ProductsScreen({ products }: { products: Product[] }) {
   return (
     <div>
       <ProductList products={products} onProductAdd={addToBasket} />
-      <Link href="/checkout">Proceed to checkout</Link>
+      <Box display="flex" justifyContent="end">
+        <Link href="/checkout">Proceed to checkout</Link>
+      </Box>
     </div>
   );
 }

@@ -1,6 +1,8 @@
-import Header from "../components/Header";
+import Header from "../components/layout/Header";
 import React from "react";
 import AppProviders from "../lib/AppProviders";
+import { fonts } from "../lib/theme/fonts";
+import Content from "../components/layout/Content";
 
 export default function RootLayout({
   children,
@@ -8,13 +10,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AppProviders>
-      <html lang="en">
-        <body>
+    <html lang="en" className={fonts.rubik.variable}>
+      <body>
+        <AppProviders>
           <Header />
-          <main>{children}</main>
-        </body>
-      </html>
-    </AppProviders>
+          <Content>{children}</Content>
+        </AppProviders>
+      </body>
+    </html>
   );
 }
